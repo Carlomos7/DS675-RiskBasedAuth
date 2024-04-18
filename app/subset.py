@@ -1,7 +1,16 @@
+import os
+import kaggle
 import pandas as pd
 
-# Load the CSV file
-df = pd.read_csv('data-sampling/rba-dataset.csv')
+# path to kaggle.json
+os.environ['KAGGLE_CONFIG_DIR'] = "~/.kaggle/kaggle.json"
+kaggle.api.authenticate()
+dataset_name = 'dasgroup/rba-dataset'
+download_path = '../data-sampling/'
+kaggle.api.dataset_download_files(dataset_name, path=download_path, unzip=True)
+
+file_name = 'rba-dataset.csv'
+df = pd.read_csv(os.path.join(download_path, file_name))
 
 # Calculate 10% of the total number of rows
 subset_size = int(0.1 * len(df))
