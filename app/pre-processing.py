@@ -3,13 +3,16 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 import pandas as pd
+from config import get_config
+
+config = get_config()
 
 # function to fill missing values with the mode
 def fill_with_mode(df):
     return df.fillna(df.mode().iloc[0])
 
 # Load the subset data
-subset_df = pd.read_csv('data-sampling/subset-rba-dataset.csv')
+subset_df = pd.read_csv(config.SUBSET_DATA_FILE)
 print("Data after loading:\n", subset_df.head())
 
 # Check for missing values
