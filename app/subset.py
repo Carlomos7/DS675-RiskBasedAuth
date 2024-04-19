@@ -32,7 +32,7 @@ cols = [
     'IP Address', 'Country', 'Region', 'City', 'ASN', 
     'User Agent String', 'OS Name and Version', 'Browser Name and Version', 
     'Device Type', 'Login Successful', 'Is Attack IP', 
-    'Is Account Takeover', 'Round-Trip Time (RTT) [ms]'
+    'Is Account Takeover'
 ]
 
 # Filtering to only include necessary columns
