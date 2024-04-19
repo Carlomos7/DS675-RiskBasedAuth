@@ -1,25 +1,39 @@
 import os
 import kaggle
 import pandas as pd
-from config import get_config
+from pathlib import Path
+from config import get_settings
 
-config = get_config()
+config = get_settings()
 
-# path to kaggle.json
-os.environ['KAGGLE_CONFIG_DIR'] = str(config.KAGGLE_CONFIG_DIR)
-kaggle.api.authenticate()
-dataset_name = config.DATASET
-download_path = config.DATA_DIR
-kaggle.api.dataset_download_files(dataset_name, path=download_path, unzip=True)
+# Ensure existing data directory
+data_directory = Path(config.DATA_DIRECTORY)
+data_directory.mkdir(parents=True, exist_ok=True)
 
-file_name = config.DATA_FILE
-df = pd.read_csv(os.path.join(download_path, file_name))
+data_file_path = data_directory / config.DATA_FILE
+
+if not data_file_path.exists():
+    # Path to kaggle.json
+    print("Downloading dataset from Kaggle...")
+    os.environ['KAGGLE_CONFIG_DIR'] = str(config.KAGGLE_CONFIG_DIR)
+    kaggle.api.authenticate()
+    kaggle.api.dataset_download_files(config.DATASET, path=config.DATA_DIRECTORY, unzip=True)
+    print(f"Dataset downloaded at {data_file_path}")
+else:
+    print(f"Dataset already downloaded at {data_file_path}")
+
+print("Creating dataframe...")
+
+df = pd.read_csv(data_file_path)
 
 # Calculate 10% of the total number of rows
-subset_size = int(0.1 * len(df))
+print("Calculating percentage of data to sample...")
+subset_size = int(config.SAMPLE_PERCENTAGE * len(df))
 
 # Randomly select the subset
+print("Creating subset...")
 subset_df = df.sample(subset_size)
 
 # Save the subset to a new CSV file
-subset_df.to_csv('data-sampling/subset-rba-dataset.csv', index=False)
+subset_df.to_csv(config.SAMPLE_DATA_DIRECTORY / f"subset_{config.DATA_FILE}", index=False)
+print(f"Subset saved at {config.SAMPLE_DATA_DIRECTORY / f'subset_{config.DATA_FILE}'}.")
