@@ -9,6 +9,8 @@ config = get_settings()
 # Ensure existing data directory
 data_directory = Path(config.DATA_DIRECTORY)
 data_directory.mkdir(parents=True, exist_ok=True)
+sample_data_directory = Path(config.SAMPLE_DATA_DIRECTORY)
+sample_data_directory.mkdir(parents=True, exist_ok=True)
 
 data_file_path = data_directory / config.DATA_FILE
 
@@ -35,5 +37,5 @@ print("Creating subset...")
 subset_df = df.sample(subset_size)
 
 # Save the subset to a new CSV file
-subset_df.to_csv(config.SAMPLE_DATA_DIRECTORY / f"subset_{config.DATA_FILE}", index=False)
+subset_df.to_csv(sample_data_directory / f"subset_{config.DATA_FILE}", index=False)
 print(f"Subset saved at {config.SAMPLE_DATA_DIRECTORY / f'subset_{config.DATA_FILE}'}.")
