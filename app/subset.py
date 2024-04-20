@@ -46,9 +46,9 @@ print(f"Performing stratified sampling based on {stratify_col}...")
 # Calculating subset size
 subset_size = int(config.SAMPLE_PERCENTAGE * len(df))
 
-# stratified sampling
+# Simplified stratified sampling using groupby and sample, excluding group keys
 subset_df = df.groupby(stratify_col, group_keys=False).apply(
-    lambda x: x.sample(min(len(x), int(np.rint(subset_size * len(x) / len(df)))))).sample(frac=1).reset_index(drop=True)
+    lambda x: x.sample(min(len(x), subset_size)), include_groups=False).sample(frac=1).reset_index(drop=True)
 
 # Save the sampled subset to a new CSV file
 subset_filename = sample_data_directory / f"subset_{config.DATA_FILE}"
