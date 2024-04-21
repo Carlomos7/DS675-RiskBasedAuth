@@ -4,16 +4,11 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from config import get_settings
+from kaggle_ops import get_kaggle_dataset
 
 config = get_settings()
 
-# Ensure existing data directory
-data_directory = Path(config.DATA_DIRECTORY)
-data_directory.mkdir(parents=True, exist_ok=True)
-sample_data_directory = Path(config.SAMPLE_DATA_DIRECTORY)
-sample_data_directory.mkdir(parents=True, exist_ok=True)
-
-data_file_path = data_directory / config.DATA_FILE
+data_file_path = get_kaggle_dataset()
 
 if not data_file_path.exists():
     # Path to kaggle.json
