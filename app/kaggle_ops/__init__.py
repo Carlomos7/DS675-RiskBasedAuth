@@ -4,7 +4,12 @@ import kaggle
 from pathlib import Path
 from config import get_settings
 
-def get_kaggle_dataset():
+def get_kaggle_dataset() -> Path:
+    """Download the Kaggle dataset and return the path to the data file
+
+    Returns:
+        Path: The path to the downloaded data file
+    """
     config = get_settings()
 
     # Ensure existing data directory
