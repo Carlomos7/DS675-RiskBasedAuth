@@ -4,7 +4,7 @@ import kaggle
 from pathlib import Path
 from config import get_settings
 
-def kaggle_dataset():
+def get_kaggle_dataset():
     config = get_settings()
 
     # Ensure existing data directory
