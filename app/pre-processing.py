@@ -3,9 +3,9 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 import pandas as pd
-from config import get_config
+from config import get_settings
 
-config = get_config()
+config = get_settings()
 
 # function to fill missing values with the mode
 def fill_with_mode(df):
