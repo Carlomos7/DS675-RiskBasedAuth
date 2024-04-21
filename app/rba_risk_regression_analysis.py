@@ -19,6 +19,9 @@ from sklearn.utils import shuffle
 from sklearn.metrics import mean_squared_error
 from config import get_settings
 from kaggle_ops import get_kaggle_dataset
+from log_config import get_logger
+
+log = get_logger("rba_risk_regression_analysis.py")
 
 config = get_settings()
 
@@ -30,8 +33,8 @@ def fill_with_mode(df):
 
 # Load the subset data
 subset_df = pd.read_csv(data_set)
-print("Data after loading:\n")
-print(subset_df.head())
+log.info("Data after loading:\n")
+log.info(subset_df.head())
 def get_RiskFactor(x, y):
     if x == True and y == True:
         return 10
@@ -45,41 +48,41 @@ def get_RiskFactor(x, y):
 subset_df['RiskFactor'] = np.vectorize(get_RiskFactor)(subset_df['Is Attack IP'],subset_df['Is Account Takeover'])
 
 
-print(subset_df.columns)
-print(subset_df.dtypes)
+log.info(subset_df.columns)
+log.info(subset_df.dtypes)
 
-print('**************Summary for initial training dataframe**************')
-print('**************numeric variables**************')
-print(subset_df.describe().transpose())
-print()
-print('**************categorical variables**************')
-print(subset_df.describe(include=['object']).transpose())
-print()
-print('**************boolean variables**************')
-print(subset_df.describe(include=['bool']).transpose())
-print()
-print('**************Checking for NaN**************')
-print(subset_df.isna().sum())
-print()
+log.info('**************Summary for initial training dataframe**************')
+log.info('**************numeric variables**************')
+log.info(subset_df.describe().transpose())
+log.info()
+log.info('**************categorical variables**************')
+log.info(subset_df.describe(include=['object']).transpose())
+log.info()
+log.info('**************boolean variables**************')
+log.info(subset_df.describe(include=['bool']).transpose())
+log.info()
+log.info('**************Checking for NaN**************')
+log.info(subset_df.isna().sum())
+log.info()
 
-print("subset_df before droping rows where RiskFactor == 999")
-print("len subset_df =",len(subset_df))
-print("Count of rows with RiskFactor 10 = ", len(subset_df[(subset_df['RiskFactor']==10)]))
-print("Count of rows with RiskFactor 1 = ", len(subset_df[(subset_df['RiskFactor']==1)]))
-print("Count of rows with RiskFactor 0.1 = ", len(subset_df[(subset_df['RiskFactor']==0.1)]))
-print("Count of rows with RiskFactor 999 = ", len(subset_df[(subset_df['RiskFactor']==999)]))
+log.info("subset_df before droping rows where RiskFactor == 999")
+log.info("len subset_df =",len(subset_df))
+log.info("Count of rows with RiskFactor 10 = ", len(subset_df[(subset_df['RiskFactor']==10)]))
+log.info("Count of rows with RiskFactor 1 = ", len(subset_df[(subset_df['RiskFactor']==1)]))
+log.info("Count of rows with RiskFactor 0.1 = ", len(subset_df[(subset_df['RiskFactor']==0.1)]))
+log.info("Count of rows with RiskFactor 999 = ", len(subset_df[(subset_df['RiskFactor']==999)]))
 
 subset_df.drop(subset_df[subset_df.RiskFactor == 999].index, inplace=True)
-print("len subset_df =",len(subset_df))
+log.info("len subset_df =",len(subset_df))
 
 df_cleaned = subset_df.dropna(axis=1)
 
-print("subset_df after droping rows where RiskFactor == 999")
-print("len subset_df =",len(df_cleaned))
-print("Count of rows with RiskFactor 10 = ", len(df_cleaned[(df_cleaned['RiskFactor']==10)]))
-print("Count of rows with RiskFactor 1 = ", len(df_cleaned[(df_cleaned['RiskFactor']==1)]))
-print("Count of rows with RiskFactor 0.1 = ", len(df_cleaned[(df_cleaned['RiskFactor']==0.1)]))
-print("Count of rows with RiskFactor 999 = ", len(df_cleaned[(df_cleaned['RiskFactor']==999)]))
+log.info("subset_df after droping rows where RiskFactor == 999")
+log.info("len subset_df =",len(df_cleaned))
+log.info("Count of rows with RiskFactor 10 = ", len(df_cleaned[(df_cleaned['RiskFactor']==10)]))
+log.info("Count of rows with RiskFactor 1 = ", len(df_cleaned[(df_cleaned['RiskFactor']==1)]))
+log.info("Count of rows with RiskFactor 0.1 = ", len(df_cleaned[(df_cleaned['RiskFactor']==0.1)]))
+log.info("Count of rows with RiskFactor 999 = ", len(df_cleaned[(df_cleaned['RiskFactor']==999)]))
 
 #df_cleaned['index'].astype('int64')
 df_cleaned.set_index(['index'], inplace=True)
@@ -87,22 +90,22 @@ df_cleaned.reset_index()
 
 # splitting dataframe by row index
 slice=round(len(df_cleaned)*0.2)
-print("len df cleaned =",len(df_cleaned))
+log.info("len df cleaned =",len(df_cleaned))
 clean_data = df_cleaned.iloc[slice:,:] #this is a dataset for training the model
 clean_test = df_cleaned.iloc[:slice,:] #this is an unseen dataset for final validation
-print(clean_data.head())
+log.info(clean_data.head())
 
-print("check if clean_data and clean test have rows of each risk factor 10, 1.0 and 0.1")
-print("len clean_data =",len(clean_data))
-print("Count of rows with RiskFactor 10 = ", len(clean_data[(clean_data['RiskFactor']==10)]))
-print("Count of rows with RiskFactor 1 = ", len(clean_data[(clean_data['RiskFactor']==1)]))
-print("Count of rows with RiskFactor 0.1 = ", len(clean_data[(clean_data['RiskFactor']==0.1)]))
-print("Count of rows with RiskFactor 999 = ", len(clean_data[(clean_data['RiskFactor']==999)]))
-print("len clean_data =",len(clean_test))
-print("Count of rows with RiskFactor 10 = ", len(clean_test[(clean_test['RiskFactor']==10)]))
-print("Count of rows with RiskFactor 1 = ", len(clean_test[(clean_test['RiskFactor']==1)]))
-print("Count of rows with RiskFactor 0.1 = ", len(clean_test[(clean_test['RiskFactor']==0.1)]))
-print("Count of rows with RiskFactor 999 = ", len(clean_test[(clean_test['RiskFactor']==999)]))
+log.info("check if clean_data and clean test have rows of each risk factor 10, 1.0 and 0.1")
+log.info("len clean_data =",len(clean_data))
+log.info("Count of rows with RiskFactor 10 = ", len(clean_data[(clean_data['RiskFactor']==10)]))
+log.info("Count of rows with RiskFactor 1 = ", len(clean_data[(clean_data['RiskFactor']==1)]))
+log.info("Count of rows with RiskFactor 0.1 = ", len(clean_data[(clean_data['RiskFactor']==0.1)]))
+log.info("Count of rows with RiskFactor 999 = ", len(clean_data[(clean_data['RiskFactor']==999)]))
+log.info("len clean_data =",len(clean_test))
+log.info("Count of rows with RiskFactor 10 = ", len(clean_test[(clean_test['RiskFactor']==10)]))
+log.info("Count of rows with RiskFactor 1 = ", len(clean_test[(clean_test['RiskFactor']==1)]))
+log.info("Count of rows with RiskFactor 0.1 = ", len(clean_test[(clean_test['RiskFactor']==0.1)]))
+log.info("Count of rows with RiskFactor 999 = ", len(clean_test[(clean_test['RiskFactor']==999)]))
 
 ## Remove unused variables
 clean_data = clean_data.drop(columns=['Login Timestamp', 'IP Address', 'OS Name and Version', 'User Agent String', 'Browser Name and Version'])
@@ -123,32 +126,32 @@ clean_test1 = pd.get_dummies(clean_test, columns=['Country'])
 clean_test = clean_test1[:clean_testOlen]
 clean_data = clean_data1[:clean_dataOlen]
 
-print("clean data head")
-print(clean_data.head())
+log.info("clean data head")
+log.info(clean_data.head())
 
 X = clean_data.drop(columns=['RiskFactor'])
 y = clean_data[['RiskFactor']]
-print(type(y)) 
+log.info(type(y)) 
 
 # Split the data into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-print("\nFirst 5 rows of training data:\n", X_train[:5])
-print("\nFirst 5 rows of test data:\n", X_test[:5])
+log.info("\nFirst 5 rows of training data:\n", X_train[:5])
+log.info("\nFirst 5 rows of test data:\n", X_test[:5])
 
-print("Split the data into training and test sets for training the model")
-print("number or rows X_train=",X_train.shape[0])
-print("number or rows y_train=",y_train.shape[0])
-print("number or rows X_test=",X_test.shape[0])
-print("number or rows y_test=",y_test.shape[0])
-print("number of columns X_train=",X_train.shape[1])
-print("number of columns y_train=",y_train.shape[1])
-print("number of columns  X_test=",X_test.shape[1])
-print("number of columns  y_test=",y_test.shape[1])
+log.info("Split the data into training and test sets for training the model")
+log.info("number or rows X_train=",X_train.shape[0])
+log.info("number or rows y_train=",y_train.shape[0])
+log.info("number or rows X_test=",X_test.shape[0])
+log.info("number or rows y_test=",y_test.shape[0])
+log.info("number of columns X_train=",X_train.shape[1])
+log.info("number of columns y_train=",y_train.shape[1])
+log.info("number of columns  X_test=",X_test.shape[1])
+log.info("number of columns  y_test=",y_test.shape[1])
 
-print("X_test columns")
-print(X_train.dtypes)
-print("y_test columns")
-print(y_train.dtypes)
+log.info("X_test columns")
+log.info(X_train.dtypes)
+log.info("y_test columns")
+log.info(y_train.dtypes)
 
 ## Random Forest model - training
 params = {'n_estimators': 200, 'max_features': 10, 'n_jobs': -1,
@@ -156,12 +159,12 @@ params = {'n_estimators': 200, 'max_features': 10, 'n_jobs': -1,
 rf_clf = ensemble.RandomForestRegressor(**params)
 rf_clf.fit(X_train, y_train)
 feature_importances = rf_clf.feature_importances_
-print ()
-print("******X_train, y_train fit******")
+log.info ()
+log.info("******X_train, y_train fit******")
 rf_score = rf_clf.score(X_train, y_train, sample_weight=None)
-print ("mean accuracy = ", rf_score)
+log.info ("mean accuracy = ", rf_score)
 mse = mean_squared_error(y_test, rf_clf.predict(X_test))
-print('RMSE =  ', mse**0.5)
+log.info('RMSE =  ', mse**0.5)
 
 ## Plot importances
 feature_importances = rf_clf.feature_importances_
@@ -181,17 +184,17 @@ target = clean_test[['RiskFactor']]
 rf_clf.fit(features,target)
 feature_importances = rf_clf.feature_importances_
 predicted=rf_clf.predict(features)
-print ()
-print("******features, target fit******")
+log.info ()
+log.info("******features, target fit******")
 rf_score = rf_clf.score(features,target, sample_weight=None)
-print ("mean accuracy = ", rf_score)
+log.info ("mean accuracy = ", rf_score)
 mse = mean_squared_error(target, predicted)
-print('RMSE =  ', mse**0.5)
-print ()
-print("******RMSE for test set with Random Forest Classifier******")
+log.info('RMSE =  ', mse**0.5)
+log.info ()
+log.info("******RMSE for test set with Random Forest Classifier******")
 RoundPred = [round(value) for value in predicted]
 mse = mean_squared_error(target, RoundPred)
-print('RMSE =  ', mse**0.5)
+log.info('RMSE =  ', mse**0.5)
 
 ## Plotting predictions vs observed
 plt.figure(1)
