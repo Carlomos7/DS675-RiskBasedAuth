@@ -54,16 +54,16 @@ log.info(subset_df.dtypes)
 log.info('**************Summary for initial training dataframe**************')
 log.info('**************numeric variables**************')
 log.info(subset_df.describe().transpose())
-log.info("")
+
 log.info('**************categorical variables**************')
 log.info(subset_df.describe(include=['object']).transpose())
-log.info("")
+
 log.info('**************boolean variables**************')
 log.info(subset_df.describe(include=['bool']).transpose())
-log.info("")
+
 log.info('**************Checking for NaN**************')
 log.info(subset_df.isna().sum())
-log.info("")
+
 
 log.info("subset_df before droping rows where RiskFactor == 999")
 log.info("len subset_df =",len(subset_df))
@@ -159,7 +159,7 @@ params = {'n_estimators': 200, 'max_features': 10, 'n_jobs': -1,
 rf_clf = ensemble.RandomForestRegressor(**params)
 rf_clf.fit(X_train, y_train)
 feature_importances = rf_clf.feature_importances_
-log.info ()
+
 log.info("******X_train, y_train fit******")
 rf_score = rf_clf.score(X_train, y_train, sample_weight=None)
 log.info ("mean accuracy = ", rf_score)
