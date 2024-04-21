@@ -3,9 +3,11 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 import pandas as pd
-from config import get_config
+from config import get_settings
+from log_config import get_logger
 
-config = get_config()
+config = get_settings()
+log = get_logger("pre-processing.py")
 
 # function to fill missing values with the mode
 def fill_with_mode(df):
@@ -13,10 +15,10 @@ def fill_with_mode(df):
 
 # Load the subset data
 subset_df = pd.read_csv(config.SUBSET_DATA_FILE)
-print("Data after loading:\n", subset_df.head())
+log.info("Data after loading:\n", subset_df.head())
 
 # Check for missing values
-print("\nMissing values in each column:\n", subset_df.isnull().sum())
+log.info("\nMissing values in each column:\n", subset_df.isnull().sum())
 
 # Define preprocessing for numeric columns (normalize them)
 numeric_features = subset_df.select_dtypes(include=['int64', 'float64']).columns
@@ -39,11 +41,11 @@ preprocessor = ColumnTransformer(
 
 # Apply transformations to our data
 X = preprocessor.fit_transform(subset_df)
-print("\nData after preprocessing:\n", X[:5])
+log.info("\nData after preprocessing:\n", X[:5])
 
 y = subset_df[['Is Attack IP', 'Is Account Takeover']]
 
 # Split the data into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-print("\nFirst 5 rows of training data:\n", X_train[:5])
-print("\nFirst 5 rows of test data:\n", X_test[:5])
+log.info("\nFirst 5 rows of training data:\n", X_train[:5])
+log.info("\nFirst 5 rows of test data:\n", X_test[:5])

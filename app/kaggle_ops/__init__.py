@@ -3,6 +3,9 @@ import os
 import kaggle
 from pathlib import Path
 from config import get_settings
+from log_config import get_logger
+
+log = get_logger(__name__)
 
 def get_kaggle_dataset() -> Path:
     """Download the Kaggle dataset and return the path to the data file
@@ -20,12 +23,12 @@ def get_kaggle_dataset() -> Path:
 
     if not data_file_path.exists():
         # Path to kaggle.json
-        print("Downloading dataset from Kaggle...")
+        log.info("Downloading dataset from Kaggle...")
         os.environ['KAGGLE_CONFIG_DIR'] = str(config.KAGGLE_CONFIG_DIR)
         kaggle.api.authenticate()
         kaggle.api.dataset_download_files(config.DATASET, path=config.DATA_DIRECTORY, unzip=True)
-        print(f"Dataset downloaded at {data_file_path}")
+        log.info(f"Dataset downloaded at {data_file_path}")
     else:
-        print(f"Dataset already downloaded at {data_file_path}")
+        log.info(f"Dataset already downloaded at {data_file_path}")
 
     return data_file_path
