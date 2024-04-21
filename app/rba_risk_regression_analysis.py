@@ -17,13 +17,24 @@ import matplotlib.pyplot as plt
 from sklearn import ensemble
 from sklearn.utils import shuffle
 from sklearn.metrics import mean_squared_error
+from pathlib import Path
+from config import get_settings
+
+config = get_settings()
+
+# Ensure existing data directory
+data_directory = Path(config.DATA_DIRECTORY)
+data_directory.mkdir(parents=True, exist_ok=True)
+sample_data_directory = Path(config.SAMPLE_DATA_DIRECTORY)
+sample_data_directory.mkdir(parents=True, exist_ok=True)
+data_file_path = data_directory / config.DATA_FILE
 
 # function to fill missing values with the mode
 def fill_with_mode(df):
     return df.fillna(df.mode().iloc[0])
 
 # Load the subset data
-subset_df = pd.read_csv('data-sampling/subset-rba-dataset.csv')
+subset_df = pd.read_csv(data_file_path)
 print("Data after loading:\n")
 print(subset_df.head())
 def get_RiskFactor(x, y):
@@ -37,6 +48,7 @@ def get_RiskFactor(x, y):
         return 999
     
 subset_df['RiskFactor'] = np.vectorize(get_RiskFactor)(subset_df['Is Attack IP'],subset_df['Is Account Takeover'])
+
 
 print(subset_df.columns)
 print(subset_df.dtypes)
