@@ -26,9 +26,20 @@ df_subset = pd.read_csv(subset_filename)
 
 # Separate the features and target variable
 log.info("Separating the features and target variable...")
-target_variable = 'Is Account Takeover'
-X = df_subset.drop('Is Account Takeover', axis=1)
-y = df_subset['Is Account Takeover']
+def get_RiskFactor(x, y):
+    if x == True and y == True:
+        return 10
+    elif x == True and y == False:
+        return 1
+    elif x == False and y == False:
+        return 0.1
+    else:
+        return 999
+
+df_subset['RiskFactor'] = np.vectorize(get_RiskFactor)(df_subset['Is Attack IP'], df_subset['Is Account Takeover'])
+target_variable = 'RiskFactor'
+X = df_subset.drop('RiskFactor', axis=1)
+y = df_subset['RiskFactor']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 
@@ -50,15 +61,18 @@ X_test = X_test.fillna(0)
 # Hyperparameter tuning
 log.info("Performing hyperparameter tuning...")
 param_grid = {
-    'n_estimators': [50],
-    'learning_rate': [0.01],
-    'max_depth': [3]
+    'n_estimators': [50, 100 , 200],
+    'learning_rate': [0.01, 0.1, 0.2],
+    'max_depth': [3,4 ,5]
 }
 
-gb = GradientBoostingRegressor(n_estimators=50, learning_rate=0.01, max_depth=3, random_state=42)
 log.info("Fitting the model...")
+gb = GradientBoostingRegressor(n_estimators=50, learning_rate=0.01, max_depth=3, random_state=42)
 gb.fit(X_train, y_train)
-""" grid_search = GridSearchCV(gb, param_grid, cv=5, scoring='neg_mean_squared_error', verbose=2, n_jobs=-1)
+
+""" 
+gb = GradientBoostingRegressor(random_state=42)
+grid_search = GridSearchCV(gb, param_grid, cv=5, scoring='neg_mean_squared_error', verbose=2, n_jobs=-1)
 log.info("Fitting the model...")
 grid_search.fit(X_train, y_train) """
 
@@ -83,11 +97,14 @@ log.info(f"Mean Squared Error (MSE): {mse}")
 log.info(f"Root Mean Squared Error (RMSE): {rmse}")
 log.info(f"R-squared (R2 Score): {r2}")
 
+# Calculate the absolute errors
+errors = np.abs(y_test - y_pred)
 
-# Plotting actual vs predicted values
+# Create a scatter plot of actual vs predicted values, colored by error
 plt.figure(figsize=(10, 6))
-plt.scatter(y_test, y_pred)
+plt.scatter(y_test, y_pred, c=errors, cmap='viridis', alpha=0.5)
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=4)
+plt.colorbar(label='Absolute Error')
 plt.xlabel('Actual')
 plt.ylabel('Predicted')
 plt.title('Actual vs Predicted')
