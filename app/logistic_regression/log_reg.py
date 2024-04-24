@@ -64,5 +64,3 @@ def log_reg():
     log.info("Final model trained, evaluated, and ROC curve plotted successfully.")
 
 log_reg()
-
-log_reg()
