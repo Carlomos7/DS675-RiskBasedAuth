@@ -5,7 +5,7 @@ from pathlib import Path
 
 class Settings(BaseSettings):
     """Configuration settings for the application"""
-
+    APP_NAME: str = "rba-app"
     APP_ROOT_DIRECTORY: Path = Path.cwd()
     LOG_DIRECTORY: Path = APP_ROOT_DIRECTORY / "logs"
     

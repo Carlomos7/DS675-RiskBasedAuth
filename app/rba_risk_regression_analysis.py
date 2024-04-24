@@ -17,13 +17,22 @@ import matplotlib.pyplot as plt
 from sklearn import ensemble
 from sklearn.utils import shuffle
 from sklearn.metrics import mean_squared_error
+from config import get_settings
+from kaggle_ops import get_kaggle_dataset
+from log_config import get_logger
+
+log = get_logger("rba_risk_regression_analysis.py")
+
+config = get_settings()
+
+data_set = get_kaggle_dataset() 
 
 # function to fill missing values with the mode
 def fill_with_mode(df):
     return df.fillna(df.mode().iloc[0])
 
 # Load the subset data
-subset_df = pd.read_csv('data-sampling/subset-rba-dataset.csv')
+subset_df = pd.read_csv(data_set)
 print("Data after loading:\n")
 print(subset_df.head())
 def get_RiskFactor(x, y):
@@ -38,22 +47,23 @@ def get_RiskFactor(x, y):
     
 subset_df['RiskFactor'] = np.vectorize(get_RiskFactor)(subset_df['Is Attack IP'],subset_df['Is Account Takeover'])
 
+
 print(subset_df.columns)
 print(subset_df.dtypes)
 
 print('**************Summary for initial training dataframe**************')
 print('**************numeric variables**************')
 print(subset_df.describe().transpose())
-print()
+
 print('**************categorical variables**************')
 print(subset_df.describe(include=['object']).transpose())
-print()
+
 print('**************boolean variables**************')
 print(subset_df.describe(include=['bool']).transpose())
-print()
+
 print('**************Checking for NaN**************')
 print(subset_df.isna().sum())
-print()
+
 
 print("subset_df before droping rows where RiskFactor == 999")
 print("len subset_df =",len(subset_df))
@@ -149,7 +159,7 @@ params = {'n_estimators': 200, 'max_features': 10, 'n_jobs': -1,
 rf_clf = ensemble.RandomForestRegressor(**params)
 rf_clf.fit(X_train, y_train)
 feature_importances = rf_clf.feature_importances_
-print ()
+
 print("******X_train, y_train fit******")
 rf_score = rf_clf.score(X_train, y_train, sample_weight=None)
 print ("mean accuracy = ", rf_score)
