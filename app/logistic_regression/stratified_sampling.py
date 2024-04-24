@@ -1,6 +1,5 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import StratifiedShuffleSplit
 from pathlib import Path
 from config import get_settings
 from log_config import get_logger
