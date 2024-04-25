@@ -16,12 +16,12 @@ import matplotlib.pyplot as plt
 # Get the configuration settings
 config = get_settings()
 log = get_logger("gradient_boosting.py")
-sample_percentage = config.SAMPLE_PERCENTAGE
+sample_percentage = config.SAMPLE_DATA_PERCENTAGE
 
 # Load the subset data
 log.info("Loading the subset data...")
 sample_data_directory = Path(config.SAMPLE_DATA_DIRECTORY)
-subset_filename = sample_data_directory / f"stratified_subset_{config.DATA_FILE}"
+subset_filename = sample_data_directory / f"stratified_subset_{config.DATA_CSV_FILENAME}"
 df_subset = pd.read_csv(subset_filename)
 
 # Separate the features and target variable

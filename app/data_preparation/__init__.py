@@ -15,6 +15,7 @@ class BasePreprocessor:
         """
         self.log = get_logger(__name__)
         self.config = get_settings()
+        self.kaggle_csv = self.config.DATA_CSV_FILENAME
         self.sample_data_directory = Path(self.config.SAMPLE_DATA_DIRECTORY)
 
     def load_data(self, filename: str) -> pd.DataFrame:
@@ -64,7 +65,7 @@ class StratifiedSampler(BasePreprocessor):
         """Initialize the StratifiedSampler class
         """
         super().__init__()
-        self.sample_percent = self.config.SAMPLE_PERCENTAGE
+        self.sample_percent = self.config.SAMPLE_DATA_PERCENTAGE
 
     def perform_stratifed_sampling(self, df: pd.DataFrame, target: str) -> pd.DataFrame:
         """Perform stratified sampling on the dataset
@@ -161,11 +162,12 @@ class StratifiedSampler(BasePreprocessor):
             sample_df = self.reduce_cardinality(sample_df, col, 100)
         sample_df = self.fill_num_median(sample_df, num_cols)
         sample_df = self.fill_cat_mode(sample_df, cat_cols)
-        stratified_sample_filename = self.sample_data_directory / f"stratified_subset_{self.config.DATA_FILE}"
+        stratified_sample_filename = self.sample_data_directory / f"stratified_subset_{self.kaggle_csv}"
         self.export_data(sample_df, stratified_sample_filename)
         return stratified_sample_filename
 
 class DataPrep(BasePreprocessor):
+    """Data preparation class for the RBA model"""
     def encode_categorical_features(self, df: pd.DataFrame, columns: list) -> pd.DataFrame:
         self.log.info("Encoding categorical features...")
         df = pd.get_dummies(df, columns=columns)
@@ -183,6 +185,6 @@ class DataPrep(BasePreprocessor):
         df = self.load_data(filename)
         df = self.select_features(df, features)
         df = self.encode_categorical_features(df, columns)
-        pre_processed_filename = self.sample_data_directory / 'pre-processed_subset_{self.config.DATA_FILE}'
+        pre_processed_filename = self.sample_data_directory / f'pre-processed_subset_{self.kaggle_csv}'
         self.export_data(df, pre_processed_filename)
         return pre_processed_filename

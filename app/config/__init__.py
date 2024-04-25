@@ -5,16 +5,24 @@ from pathlib import Path
 
 class Settings(BaseSettings):
     """Configuration settings for the application"""
+    
     APP_NAME: str = "rba-app"
     APP_ROOT_DIRECTORY: Path = Path.cwd()
     LOG_DIRECTORY: Path = APP_ROOT_DIRECTORY / "logs"
     
-    KAGGLE_CONFIG_DIR: Path = Field(..., env="KAGGLE_CONFIG_DIR")
-    DATASET: str = Field(default="dasgroup/rba-dataset", env="DATASET")
-    DATA_DIRECTORY: str = "data"
-    SAMPLE_DATA_DIRECTORY: Path = Path(DATA_DIRECTORY) / "sample_data"
-    DATA_FILE: str = Field(default="rba-dataset.csv", env="DATA_FILE")
-    SAMPLE_PERCENTAGE: float = Field(default=0.1, env="SAMPLE_PERCENT")
+    # Kaggle Configuration
+    KAGGLE_CONFIG_PATH: Path = Field(..., env="KAGGLE_CONFIG_PATH")
+    KAGGLE_DATASET_NAME: str = Field(default="dasgroup/rba-dataset", env="KAGGLE_DATASET_NAME")
+    
+    # Data Directories
+    DATA_ROOT_DIRECTORY: Path = Path("data")
+    KAGGLE_DATASET_DIRECTORY: Path = DATA_ROOT_DIRECTORY / "kaggle_dataset"
+    SAMPLE_DATA_DIRECTORY: Path = DATA_ROOT_DIRECTORY / "sample_data"
+    PLOTS_DIRECTORY: Path = DATA_ROOT_DIRECTORY / "plots"
+    
+    # Dataset and Sample Configuration
+    DATA_CSV_FILENAME: str = Field(default="rba-dataset.csv", env="DATA_CSV_FILENAME")
+    SAMPLE_DATA_PERCENTAGE: float = Field(default=0.1, env="SAMPLE_DATA_PERCENTAGE")
 
     class Config:
         env_file = ".env"
