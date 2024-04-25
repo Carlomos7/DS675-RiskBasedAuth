@@ -19,6 +19,7 @@ class LogisticRegressionModel:
     def __init__(self):
         self.log = get_logger(__name__)
         self.config = get_settings()
+        self.plots_directory = self.config.PLOTS_DIRECTORY
         self.sample_data_directory = Path(self.config.SAMPLE_DATA_DIRECTORY)
     
     def load_data(self, filename: str) -> pd.DataFrame:
@@ -103,10 +104,10 @@ class LogisticRegressionModel:
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
         plt.show()
-        image_save_path = self.sample_data_directory / 'lr_roc_curve.png'
-        self.log.info("Saving plot ...")
-        plt.savefig(image_save_path)
-        self.log.info(f"ROC curve saved to {image_save_path}")
+        plot_save_path = self.plots_directory / 'lr_roc_curve.png'
+        self.log.info("Saving ROC plot ...")
+        plt.savefig(plot_save_path)
+        self.log.info(f"ROC curve saved to {plot_save_path}")
     
     def get_risk_factors(self, x, y) -> pd.DataFrame:
         """ Get the risk factors for the model
@@ -149,10 +150,10 @@ class LogisticRegressionModel:
         plt.xlabel('Risk Factor')
         plt.ylabel('Count')
         plt.show()
-        image_save_path = self.sample_data_directory / 'lr_risk_factor_distribution.png'
-        self.log.info("Saving plot ...")
-        plt.savefig(image_save_path)
-        self.log.info(f"ROC curve saved to {image_save_path}")
+        plot_save_path = self.plots_directory / 'risk_factor_distribution.png'
+        self.log.info("Saving Risk factor plot ...")
+        plt.savefig(plot_save_path)
+        self.log.info(f"Risk factor distribution saved to {plot_save_path}")
         
         
     def export_data(self, df: pd.DataFrame, filename: str) -> None:
