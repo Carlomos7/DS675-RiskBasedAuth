@@ -1,10 +1,14 @@
 """ This is the logistic regression module.
 """
 
+# Author: Carlos Ray Segarra
+# Created: Apr 2024
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_auc_score, confusion_matrix, classification_report, roc_curve, auc
+from sklearn.model_selection import GridSearchCV
 from pathlib import Path
 from config import get_settings
 from log_config import get_logger
@@ -16,6 +20,8 @@ class LogisticRegressionModel:
     def __init__(self):
         self.log = get_logger(__name__)
         self.config = get_settings()
+        self.plots_directory = self.config.PLOTS_DIRECTORY
+        self.plots_directory.mkdir(parents=True, exist_ok=True)
         self.sample_data_directory = Path(self.config.SAMPLE_DATA_DIRECTORY)
     
     def load_data(self, filename: str) -> pd.DataFrame:
@@ -46,7 +52,7 @@ class LogisticRegressionModel:
         return train_test_split(X, y, test_size=0.2, random_state=42)
     
     def train_model(self, X_train: pd.DataFrame, y_train: pd.Series) -> LogisticRegression:
-        """ Train the logistic regression model
+        """ Train the logistic regression model with parameter tuning
 
         Args:
             X_train (pd.DataFrame): DataFrame of features
@@ -55,9 +61,12 @@ class LogisticRegressionModel:
         Returns:
             LogisticRegression: Trained logistic regression model
         """
-        model = LogisticRegression()
-        model.fit(X_train, y_train)
-        return model
+        params = {'C': [0.01, 0.1], 'penalty': ['l1', 'l2']}
+        model = LogisticRegression(max_iter=1000, solver='liblinear')
+        grid_search = GridSearchCV(model, params, cv=5, scoring='roc_auc')
+        grid_search.fit(X_train, y_train)
+        self.log.info(f"Best parameters found: {grid_search.best_params_}")
+        return grid_search.best_estimator_
     
     def evaluate_model(self, model: LogisticRegression, X_test: pd.DataFrame, y_test: pd.Series) -> tuple:
         """ Evaluate the model by calculating the ROC-AUC (ROC - Area Under Curve) score, confusion matrix, and classification report (precision, recall, f1-score, support)
@@ -71,8 +80,9 @@ class LogisticRegressionModel:
         Returns:
             tuple: ROC-AUC score, confusion matrix, classification report
         """
-        y_pred = model.predict(X_test)
         y_pred_prob = model.predict_proba(X_test)[:, 1]
+        threshold = 0.3
+        y_pred = (y_pred_prob > threshold).astype(int)
         roc_auc = roc_auc_score(y_test, y_pred_prob)
         conf_matrix = confusion_matrix(y_test, y_pred)
         # Referenced: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score
@@ -100,10 +110,10 @@ class LogisticRegressionModel:
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
         plt.show()
-        image_save_path = self.sample_data_directory / 'lr_roc_curve.png'
-        self.log.info("Saving plot ...")
-        plt.savefig(image_save_path)
-        self.log.info(f"ROC curve saved to {image_save_path}")
+        plot_save_path = self.plots_directory / 'lr_roc_curve.png'
+        self.log.info("Saving ROC plot ...")
+        plt.savefig(plot_save_path)
+        self.log.info(f"ROC curve saved to {plot_save_path}")
     
     def get_risk_factors(self, x, y) -> pd.DataFrame:
         """ Get the risk factors for the model
@@ -146,10 +156,10 @@ class LogisticRegressionModel:
         plt.xlabel('Risk Factor')
         plt.ylabel('Count')
         plt.show()
-        image_save_path = self.sample_data_directory / 'lr_risk_factor_distribution.png'
-        self.log.info("Saving plot ...")
-        plt.savefig(image_save_path)
-        self.log.info(f"ROC curve saved to {image_save_path}")
+        plot_save_path = self.plots_directory / 'risk_factor_distribution.png'
+        self.log.info("Saving Risk factor plot ...")
+        plt.savefig(plot_save_path)
+        self.log.info(f"Risk factor distribution saved to {plot_save_path}")
         
         
     def export_data(self, df: pd.DataFrame, filename: str) -> None:

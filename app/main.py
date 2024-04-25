@@ -1,5 +1,4 @@
-from config import get_settings
-from log_config import get_logger
+# Description: Main script to run the logistic regression model on the Kaggle dataset.
 from kaggle_ops import get_kaggle_dataset
 from data_preparation import DataPrep, StratifiedSampler
 from logistic_regression import LogisticRegressionModel
