@@ -1,3 +1,10 @@
+"""
+============================
+DS675 Suhney Ahmadi
+Risk Based Authentication
+============================
+"""
+
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
@@ -42,7 +49,6 @@ X = df_subset.drop('RiskFactor', axis=1)
 y = df_subset['RiskFactor']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-
 # Identify categorical columns
 categorical_cols = X_train.select_dtypes(include='object').columns
 
@@ -57,28 +63,13 @@ X_train, X_test = X_train.align(X_test, join='left', axis=1)
 # Fill missing values with 0 in test set (for categories not present in the test set)
 X_test = X_test.fillna(0)
 
-
 # Hyperparameter tuning
 log.info("Performing hyperparameter tuning...")
-param_grid = {
-    'n_estimators': [50, 100 , 200],
-    'learning_rate': [0.01, 0.1, 0.2],
-    'max_depth': [3,4 ,5]
-}
+params = {'n_estimators': 200, 'max_depth': 3, 'learning_rate': 0.1, 'random_state': 123}
 
+gb = GradientBoostingRegressor(**params)
 log.info("Fitting the model...")
-gb = GradientBoostingRegressor(n_estimators=50, learning_rate=0.01, max_depth=3, random_state=42)
-gb.fit(X_train, y_train)
-
-""" 
-gb = GradientBoostingRegressor(random_state=42)
-grid_search = GridSearchCV(gb, param_grid, cv=5, scoring='neg_mean_squared_error', verbose=2, n_jobs=-1)
-log.info("Fitting the model...")
-grid_search.fit(X_train, y_train) """
-
-# Get the best model
-""" log.info("Getting the best model...")
-gb = grid_search.best_estimator_ """
+gb.fit(X_train, y_train.values.ravel())
 
 # Make predictions
 log.info("Making predictions...")
