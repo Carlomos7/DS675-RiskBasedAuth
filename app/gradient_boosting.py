@@ -22,8 +22,9 @@ import matplotlib.pyplot as plt
 
 # Get the configuration settings
 config = get_settings()
-log = get_logger("gradient_boosting.py")
+log = get_logger("gradient_boosting")
 sample_percentage = config.SAMPLE_DATA_PERCENTAGE
+plots_directory = config.PLOTS_DIRECTORY
 
 # Load the subset data
 log.info("Loading the subset data...")
@@ -99,4 +100,7 @@ plt.colorbar(label='Absolute Error')
 plt.xlabel('Actual')
 plt.ylabel('Predicted')
 plt.title('Actual vs Predicted')
+plot_save_path = plots_directory / 'gb_actual_vs_predicted.png'
+plt.savefig(plot_save_path)
+log.info(f"Saved the Actual vs Predicted plot to {plot_save_path}")
 plt.show()
