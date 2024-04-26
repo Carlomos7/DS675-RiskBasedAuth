@@ -7,15 +7,24 @@ rba-dataset.csv was downloaded from Caggle
 """
 
 from sklearn.model_selection import train_test_split
+from config import get_settings
+from log_config import get_logger
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import ensemble
 from sklearn.metrics import mean_squared_error
+from kaggle_ops import get_kaggle_dataset
 import math
 
+# 
+config = get_settings()
+log = get_logger("random_forest_regressor")
+datatset = get_kaggle_dataset()
+plots_directory = config.PLOTS_DIRECTORY
+
 # Load the CSV file
-df = pd.read_csv('rba-dataset.csv')
+df = pd.read_csv(datatset)
 
 # Calculate 15% of the total number of rows
 subset_size = int(0.15 * len(df))
@@ -163,7 +172,9 @@ plt.title('Feature Importances')
 plt.barh(range(len(indices)), feature_importances[indices], color='b', align='center')
 plt.yticks(range(len(indices)), [X_train.columns[i] for i in indices])
 plt.xlabel('Relative Importance')
-plt.show()
+plot_save_path = plots_directory / 'rf_feature_importances.png'
+log.info(f"Saved feature importances plot to {plot_save_path}")
+#plt.show()
 
 ## Using trained model for test sample prediction
 print("****** Random Forest Classifier ******")
@@ -185,7 +196,10 @@ plt.figure(1)
 plt.plot(target, predicted, 'bo')
 plt.xlabel('Actual')
 plt.ylabel('Predicted')
-plt.show()
+plots_save_path = plots_directory / 'rf_predictions_vs_observed.png'
+plt.savefig(plots_save_path)
+log.info(f"Saved predictions vs observed plot to {plots_save_path}")
+#plt.show()
 
 ## Prediction and data output
 #RoundPred = [round(value) for value in predictions_test]
