@@ -16,3 +16,49 @@ Create a `.env` file in the root directory with the following content and replac
 # .env
 KAGGLE_CONFIG_PATH=/path/to/kaggle.json
 ```
+
+## Installation/Setup
+
+- Start by cloning the repository
+
+```bash
+git clone git@github.com:Carlomos7/DS675-RiskBasedAuth.git
+cd DS675-RiskBasedAuth
+```
+
+- Create a virtual environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+- Install the required packages
+
+```bash
+pip install -r requirements.txt
+```
+
+## Running the code
+
+- To run the code, please do so in the following order:
+
+### Logistic Regression
+
+```bash
+# this will pull the kaggle dataset into data/kaggle_data/
+# And it runs the logistic_regression logic - @Carlomos7
+python app/main.py
+```
+
+### Gradient Boosting
+
+```bash
+python app/gradient_boosting.py
+```
+
+### Random Forest
+
+```bash
+python app/random_forest_regressor.py
+```
