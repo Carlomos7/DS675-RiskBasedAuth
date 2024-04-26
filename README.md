@@ -47,18 +47,18 @@ pip install -r requirements.txt
 
 ```bash
 # this will pull the kaggle dataset into data/kaggle_data/
-# And it runs the logistic_regression logic - @Carlomos7
-python app/main.py
+# And it runs the logistic_regression logic
+python app/main.py # @Carlomos7 (Carlos Segarra)
 ```
 
 ### Gradient Boosting
 
 ```bash
-python app/gradient_boosting.py
+python app/gradient_boosting.py # @Suhney23 (Suhney Ahmadi)
 ```
 
 ### Random Forest
 
 ```bash
-python app/random_forest_regressor.py
+python app/random_forest_regressor.py # @yk346 (Yevgeniy Kim)
 ```
