@@ -103,4 +103,4 @@ plt.title('Actual vs Predicted')
 plot_save_path = plots_directory / 'gb_actual_vs_predicted.png'
 plt.savefig(plot_save_path)
 log.info(f"Saved the Actual vs Predicted plot to {plot_save_path}")
-plt.show()
+#plt.show()
