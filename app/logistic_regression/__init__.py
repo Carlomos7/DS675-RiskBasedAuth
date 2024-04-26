@@ -5,10 +5,12 @@
 # Created: Apr 2024
 
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_auc_score, confusion_matrix, classification_report, roc_curve, auc
 from sklearn.model_selection import GridSearchCV
+from sklearn.utils import class_weight
 from pathlib import Path
 from config import get_settings
 from log_config import get_logger
@@ -61,8 +63,10 @@ class LogisticRegressionModel:
         Returns:
             LogisticRegression: Trained logistic regression model
         """
-        params = {'C': [0.01, 0.1], 'penalty': ['l1', 'l2']}
-        model = LogisticRegression(max_iter=1000, solver='liblinear')
+        # only two values for each parameter for demonstration purposes, takes too long otherwise :/
+        params = {'C': [0.01, 0.1], 'penalty': ['l1', 'l2']}    
+        # Initialize the logistic regression model with max iterations of 1000 for convergence and solver as 'liblinear' for small datasets, and class_weight as 'balanced' to handle class imbalance
+        model = LogisticRegression(max_iter=1000, solver='liblinear', class_weight='balanced')
         grid_search = GridSearchCV(model, params, cv=5, scoring='roc_auc')
         grid_search.fit(X_train, y_train)
         self.log.info(f"Best parameters found: {grid_search.best_params_}")
@@ -109,11 +113,35 @@ class LogisticRegressionModel:
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
+        plt.savefig(plot_save_path)
         plt.show()
         plot_save_path = self.plots_directory / 'lr_roc_curve.png'
         self.log.info("Saving ROC plot ...")
-        plt.savefig(plot_save_path)
         self.log.info(f"ROC curve saved to {plot_save_path}")
+
+    def plot_comparison_analysis(self, df: pd.DataFrame) -> None:
+        """Plot the comparison analysis of risk categories
+        
+        Args:
+            df (pd.DataFrame): DataFrame containing risk factors
+        """
+        
+        # Generate comparison analysis of risk categories
+        comparison_analysis = pd.crosstab(df['True'], df['Predicted'])
+        self.log.info("Comparison analysis of risk categories:\n")
+        self.log.info(comparison_analysis)
+        
+        # Plot the comparison analysis
+        self.log.info("Plotting the comparison analysis...")
+        comparison_analysis.plot(kind='bar', stacked=True)
+        plt.title("Comparison Analysis of Risk Categories")
+        plt.xlabel('True Risk Category')
+        plt.ylabel('Predicted Risk Category Count')
+        plt.savefig(plot_save_path)
+        plt.show()
+        plot_save_path = self.plots_directory / 'comparison_analysis.png'
+        self.log.info("Saving comparison analysis plot ...")
+        self.log.info(f"Comparison analysis plot saved to {plot_save_path}")
     
     def get_risk_factors(self, x, y) -> pd.DataFrame:
         """ Get the risk factors for the model
@@ -144,22 +172,6 @@ class LogisticRegressionModel:
         })
         
         return risk_factors_df
-    
-    def plot_risk_factor_distribution(self, df: pd.DataFrame) -> None:
-        """ Plot the distribution of risk factors
-
-        Args:
-            df (pd.DataFrame): The DataFrame containing the risk factors
-        """
-        df['Risk Factor'].value_counts().plot(kind='bar',figsize=(10,6))
-        plt.title('Risk Factor Distribution')
-        plt.xlabel('Risk Factor')
-        plt.ylabel('Count')
-        plt.show()
-        plot_save_path = self.plots_directory / 'risk_factor_distribution.png'
-        self.log.info("Saving Risk factor plot ...")
-        plt.savefig(plot_save_path)
-        self.log.info(f"Risk factor distribution saved to {plot_save_path}")
         
         
     def export_data(self, df: pd.DataFrame, filename: str) -> None:
@@ -174,15 +186,19 @@ class LogisticRegressionModel:
         self.log.info(f"Data exported to {filename}")
 
     def run(self, filename: str) -> None:
+        """Run the logistic regression model"""
+        
         df = self.load_data(filename)
         X_train, X_test, y_train, y_test = self.split_data(df)
         model = self.train_model(X_train, y_train)
         roc_auc, conf_matrix, class_report = self.evaluate_model(model, X_test, y_test)
         risk_factors = self.get_risk_factors(model.predict(X_test), y_test)
         self.export_data(risk_factors, self.sample_data_directory / 'risk_factors.csv')
-        self.plot_risk_factor_distribution(risk_factors)
         self.plot_roc_curve(y_test, model.predict_proba(X_test)[:, 1])
+        self.plot_comparison_analysis(risk_factors)
+        
+        # Log the results
         self.log.info(f"ROC-AUC Score: {roc_auc}")
         self.log.info(f"Confusion Matrix:\n{conf_matrix}")
         self.log.info(f"Classification Report:\n{class_report}")
-        self.log.info("Model trained, evaluated, and ROC curve plotted successfully.")
+        self.log.info("Model trained, evaluated, and plotted successfully.")
