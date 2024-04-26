@@ -2,6 +2,7 @@
 ============================
 DS675 Yevgeniy Kim
 Risk Based Authentication
+rba-dataset.csv was downloaded from Caggle
 ============================
 """
 
@@ -13,14 +14,15 @@ from sklearn import ensemble
 from sklearn.metrics import mean_squared_error
 import math
 
-# function to fill missing values with the mode
-def fill_with_mode(df):
-    return df.fillna(df.mode().iloc[0])
+# Load the CSV file
+df = pd.read_csv('rba-dataset.csv')
 
-# Load the subset data
-subset_df = pd.read_csv('data-sampling/subset-rba-dataset.csv')
-print("Data after loading:\n")
-print(subset_df.head())
+# Calculate 15% of the total number of rows
+subset_size = int(0.15 * len(df))
+
+# Randomly select the subset
+subset_df = df.sample(n=subset_size, random_state=123)
+
 def get_RiskFactor(x, y):
     if x == True and y == True:
         return 10
