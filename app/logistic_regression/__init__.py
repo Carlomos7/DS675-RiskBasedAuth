@@ -113,9 +113,9 @@ class LogisticRegressionModel:
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
+        plot_save_path = self.plots_directory / 'lr_roc_curve.png'
         plt.savefig(plot_save_path)
         plt.show()
-        plot_save_path = self.plots_directory / 'lr_roc_curve.png'
         self.log.info("Saving ROC plot ...")
         self.log.info(f"ROC curve saved to {plot_save_path}")
 
@@ -137,9 +137,9 @@ class LogisticRegressionModel:
         plt.title("Comparison Analysis of Risk Categories")
         plt.xlabel('True Risk Category')
         plt.ylabel('Predicted Risk Category Count')
+        plot_save_path = self.plots_directory / 'comparison_analysis.png'
         plt.savefig(plot_save_path)
         plt.show()
-        plot_save_path = self.plots_directory / 'comparison_analysis.png'
         self.log.info("Saving comparison analysis plot ...")
         self.log.info(f"Comparison analysis plot saved to {plot_save_path}")
     
